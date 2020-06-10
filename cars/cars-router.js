@@ -1,15 +1,17 @@
 const express = require('express');
-
-const db = require('../data/connection');
+const knex = require('knex')
+const configOptions = require('../knexfile').development
+const db = knex(configOptions)
 
 const router = express.Router()
 
 router.get('/', (req, res) => {
-  db('cars')
+  db('carInfo')
   .then(cars => {
     res.json(cars); 
   })
   .catch (err => {
+      console.log(err)
     res.status(500).json({ message: 'Failed to get cars' });
   });
 });
@@ -29,9 +31,9 @@ router.get('/:id', (req, res) => {
 
 router.post('/', (req, res) => {
   const carsData = req.body;
-  db('cars').insert(carsData)
+  db('carInfo').insert(carsData)
   .then(ids => {
-    db('cars').where({ id: ids[0] })
+    db('carInfo').where({ id: ids[0] })
     .then(newCar => {
       res.status(201).json(newCar);
     });
